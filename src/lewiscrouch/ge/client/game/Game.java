@@ -1,21 +1,21 @@
 package lewiscrouch.ge.client.game;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-
-import lewiscrouch.ge.client.gui.Canvas;
-import lewiscrouch.ge.client.gui.Display;
+import lewiscrouch.ge.client.gui.GuiMainMenu;
 import lewiscrouch.ge.client.gui.GuiScreen;
-import lewiscrouch.ge.client.gui.GuiTest;
-import lewiscrouch.ge.client.gui.Renderer;
+import lewiscrouch.lib.display.Display;
+import lewiscrouch.lib.display.ResizeListener;
+import lewiscrouch.lib.util.TimeConverter;
 
 public class Game
-	implements Renderer
+	implements ResizeListener
 {
+	public static int SCALE = 5;
+	public static int SIZE = 16;
+	public static int SCALED_SIZE() { return Game.SIZE * Game.SCALE; }
+
 	private static Game instance;
 
-	private final String name = "GameEngine";
+	private final String name = "Game Test";
 	private final String version = "1.0";
 	private final int targetUPS = 24;
 
@@ -24,9 +24,6 @@ public class Game
 	private int seconds;
 	private int currentUPS;
 
-	public static int TILE_SIZE = 16;
-	public static int TILE_SCALE = 2;
-
 	private GuiScreen currentScreen;
 
 	public Game()
@@ -34,13 +31,13 @@ public class Game
 		Game.instance = this;
 
 		Display.create(this.name, 576, 576);
-		Canvas.setRenderer(this);
+		Display.getInstance().addResizeListener(this);
 
 		this.updates = 0;
 		this.seconds = 0;
 		this.currentUPS = 0;
 
-		this.currentScreen = new GuiTest();
+		this.displayScreen(new GuiMainMenu());
 
 		this.startGame();
 	}
@@ -62,7 +59,8 @@ public class Game
 			{
 				this.update();
 				updatesThisSecond++;
-				Canvas.getInstance().repaint();
+				this.render();
+				Display.getInstance().repaintContent();
 				prev = curr;
 			}
 
@@ -77,19 +75,46 @@ public class Game
 
 	private void update()
 	{
-		if(++this.updates % this.targetUPS == 0) this.seconds++;
+		if(++this.updates % this.targetUPS == 0)
+		{
+			this.seconds++;
+		}
 
-		if(this.currentScreen != null) this.currentScreen.update();
+		if(this.currentScreen != null)
+		{
+			this.currentScreen.update();
+		}
 	}
 
-	public void render(Graphics2D gfx)
+	public void render()
 	{
-		if(this.currentScreen != null) this.currentScreen.render(gfx);
+		if(this.currentScreen != null)
+		{
+			this.currentScreen.render();
+		}
 
-		Canvas.drawStrWithShadow(gfx, this.name + " v" + this.version, 16, 32, Color.WHITE);
-		gfx.setFont(new Font("Arial", Font.PLAIN, 12));
-		Canvas.drawStrWithShadow(gfx, this.currentUPS + " FPS", 16, 48, new Color(250, 250, 250));
-		gfx.setFont(Canvas.DEFAULT_FONT);
+//		RString rs = new RString(2, 2, this.name + " v" + this.version);
+//		rs.setFont("Yu Gothic");
+//		rs.setY(Display.getInnerHeight() - rs.getStringHeight() + 2);
+//		rs.setColor(new Color(0, 0, 0));
+//		rs.setShadow(false);
+//		rs.setStyle(java.awt.Font.BOLD);
+//		RenderQueue.add(rs);
+	}
+
+	@Override
+	public void onResize()
+	{
+		if(Game.SCALED_SIZE() * 9 < Display.getInnerWidth() || Game.SCALED_SIZE() * 9 < Display.getInnerHeight())
+		{
+			Game.SCALE++;
+		}
+		if(Game.SCALED_SIZE() * 9 > Display.getInnerWidth() || Game.SCALED_SIZE() * 9 > Display.getInnerHeight())
+		{
+			Game.SCALE--;
+		}
+
+		if(this.currentScreen != null) this.currentScreen.onResize();
 	}
 
 	public String getName()
@@ -122,6 +147,11 @@ public class Game
 		return this.seconds;
 	}
 
+	public String getTimeRunning()
+	{
+		return TimeConverter.format(this.seconds);
+	}
+
 	public int getCurrentUPS()
 	{
 		return this.currentUPS;
@@ -132,7 +162,7 @@ public class Game
 		return this.currentScreen;
 	}
 
-	public void setCurrentScreen(GuiScreen currentScreen)
+	public void displayScreen(GuiScreen currentScreen)
 	{
 		this.currentScreen = currentScreen;
 	}
