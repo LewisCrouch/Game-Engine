@@ -1,4 +1,7 @@
 # Game-Engine
+**Notes**
+ * Uses LC_lib.jar (https://github.com/LewisCrouch/Java-Library)
+
 **Todo**
 * GuiTextField is buggy
 * Rendering is a little hacky
