@@ -1,4 +1,9 @@
 # Game-Engine
+Game Engine, kinda.
+
+**Notes**
+ * Uses LC_lib.jar (https://github.com/LewisCrouch/Java-Library)
+
 **Todo**
 * GuiTextField is buggy
 * Rendering is a little hacky
@@ -8,3 +13,4 @@
 * Build internal server, meaning that the game will run with a server at all times
 * Create tiles and entities
 * Create custom font and font renderer, will make handling font sizes a lot easier and will be more fitting
+* ~~Comment code~~ Yeah, maybe
