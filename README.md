@@ -1,4 +1,6 @@
 # Game-Engine
+Game Engine, kinda.
+
 **Notes**
  * Uses LC_lib.jar (https://github.com/LewisCrouch/Java-Library)
 
