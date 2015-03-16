@@ -35,12 +35,11 @@ public class ClientListener extends Thread
 			if(obj instanceof Packet)
 			{
 				Packet p = (Packet) obj;
-				Logger.info("Key: " + p.getKey());
 				if(p.getValue() instanceof String)
 				{
 					if(p.getKey().equalsIgnoreCase("register"))
 					{
-						System.out.println("Client attempting to register.");
+						Logger.info("Client attempting to register.");
 
 						String cred = (String) p.getValue();
 
@@ -54,13 +53,18 @@ public class ClientListener extends Thread
 							if(success)
 							{
 								String key = this.server.loginClient(username, password, this);
+								Logger.info(key);
+								if(key != null)
+								{
+									this.session = new Session(key, username);
 
-								this.session = new Session(key, username);
-
-								Logger.info("Client with username " + username + " connected.");
-								this.server.messageAllClients(username + " connected.");
-
-								return;
+									Logger.info("Client with username " + username + " connected.");
+									this.server.messageAllClients(username + " connected.");
+									this.msgClient("Connected.");
+									return;
+								}
+								Logger.err("Client login unsuccessful.");
+								this.msgClient("Login unsuccessful.");
 							}
 							else
 							{
@@ -76,7 +80,7 @@ public class ClientListener extends Thread
 					}
 					else if(p.getKey().equalsIgnoreCase("login"))
 					{
-						System.out.println("Client attempting to login.");
+						Logger.info("Client attempting to login.");
 
 						String cred = (String) p.getValue();
 
@@ -85,13 +89,20 @@ public class ClientListener extends Thread
 							String[] parts = cred.split(":");
 							String username = parts[0];
 							String password = parts[1];
+
 							String key = this.server.loginClient(username, password, this);
+							Logger.info(key);
+							if(key != null)
+							{
+								this.session = new Session(key, username);
 
-							this.session = new Session(key, username);
-
-							Logger.info("Client with username " + username + " connected.");
-							this.server.messageAllClients(username + " connected.");
-							return;
+								Logger.info("Client with username " + username + " connected.");
+								this.server.messageAllClients(username + " connected.");
+								this.msgClient("Connected.");
+								return;
+							}
+							Logger.err("Client login unsuccessful.");
+							this.msgClient("Login unsuccessful.");
 						}
 						else
 						{
@@ -101,7 +112,7 @@ public class ClientListener extends Thread
 					}
 					else if(p.getKey().equalsIgnoreCase("who"))
 					{
-						System.out.println("Client attempting to get players online.");
+						Logger.info("Client attempting to get players online.");
 
 						this.msgClient("Players online:");
 						String players = "";
@@ -126,7 +137,8 @@ public class ClientListener extends Thread
 					else
 					{
 						Logger.err("Client failed to follow protocol (Command not recognised) - disconnecting.");
-						this.msgClient("Disconnecting due to failed protocol.");
+						this.msgClient("Command not recognized.");
+						return;
 					}
 				}
 				else

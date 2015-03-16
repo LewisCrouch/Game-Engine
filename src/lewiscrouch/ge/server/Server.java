@@ -53,8 +53,11 @@ public class Server
 				ClientListener cl = new ClientListener(this, socket);
 				if(!cl.isDisconnected())
 				{
-					this.onlineClients.add(cl);
 					cl.start();
+				}
+				else
+				{
+					this.onlineClients.remove(cl);
 				}
 			}
 
@@ -171,12 +174,12 @@ public class Server
 
 	public String loginClient(String username, String password, ClientListener cl)
 	{
-		if(!this.isClientOnline(username)) return null;
+		if(this.isClientOnline(username)) return null;
 
 		ServerSession client = this.getClientByUsername(username);
 		if(client.getPassword().equals(password))
 		{
-			
+			this.onlineClients.add(cl);
 			return client.toString();
 		}
 		return null;
