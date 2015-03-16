@@ -1,6 +1,8 @@
 # Game-Engine
 Game Engine, kinda.
 
+**For personal use only. Not for commercial use. Do not distribute.**
+
 **Notes**
  * Uses LC_lib.jar (https://github.com/LewisCrouch/Java-Library)
 
