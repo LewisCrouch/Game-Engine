@@ -2,13 +2,19 @@ package lewiscrouch.ge.client.gui;
 
 import java.awt.event.KeyEvent;
 
+import lewiscrouch.ge.client.game.Game;
+import lewiscrouch.ge.common.dimension.Dimension;
+import lewiscrouch.ge.common.dimension.Tile;
 import lewiscrouch.lib.display.Keyboard;
 import lewiscrouch.lib.display.RenderQueue;
+import lewiscrouch.lib.display.renderable.RImage;
 import lewiscrouch.lib.display.renderable.RString;
 
 public class GuiIngame extends GuiScreen
 {
 	private GuiChat chat;
+
+	private Dimension dimension;
 
 	@Override
 	public void init()
@@ -17,6 +23,8 @@ public class GuiIngame extends GuiScreen
 
 		this.addControl(this.chat = new GuiChat(1));
 		this.chat.giveFocus();
+
+		this.dimension = new Dimension("Template");
 	}
 
 	@Override
@@ -35,11 +43,44 @@ public class GuiIngame extends GuiScreen
 	@Override
 	public void renderScreen()
 	{
-		this.renderDefaultBackground();
+		for(Tile tile : this.dimension.getTiles())
+		{
+			for(Integer imageID : tile.getBackgroundImages())
+			{
+				int x = tile.getDimensionCoords().getX();
+				int y = tile.getDimensionCoords().getY();
+				RImage ri = new RImage(x, y, imageID);
+				ri.setWidth(Game.SCALED_SIZE());
+				ri.setHeight(Game.SCALED_SIZE());
+				ri.setX(Game.SCALED_SIZE() * x);
+				ri.setY(Game.SCALED_SIZE() * y);
+				RenderQueue.add(ri);
+			}
 
-		RString rs = new RString(20, 20, "Press 'Enter' for chat.");
-		rs.setSize(24);
+			int x = tile.getDimensionCoords().getX();
+			int y = tile.getDimensionCoords().getY();
+			int imageID = tile.getImageID();
+			RImage ri = new RImage(x, y, imageID);
+			ri.setWidth(Game.SCALED_SIZE());
+			ri.setHeight(Game.SCALED_SIZE());
+			ri.setX(Game.SCALED_SIZE() * x);
+			ri.setY(Game.SCALED_SIZE() * y);
+			RenderQueue.add(ri);
+		}
+
+		RString rs = new RString(10, 10, "Map: " + this.dimension.getTitle());
+		rs.setSize(18);
 		rs.setShadow(true);
 		RenderQueue.add(rs);
+	}
+
+	public GuiChat getChat()
+	{
+		return this.chat;
+	}
+
+	public Dimension getDimension()
+	{
+		return this.dimension;
 	}
 }

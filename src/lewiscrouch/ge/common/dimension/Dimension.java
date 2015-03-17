@@ -13,12 +13,12 @@ public class Dimension
 	private List<Entity> entities; // virtual
 	private List<Tile> tiles; // physical
 
-	public Dimension(String title, int scale)
+	public Dimension(String title)
 	{
 		this.title = title;
 
 		this.entities = new ArrayList<Entity>();
-		this.tiles = new ArrayList<Tile>();
+		this.tiles = new MapLoader(this, "map_" + title.toLowerCase() + ".tm").loadMap();
 	}
 
 	public boolean tileExists(int x, int y)

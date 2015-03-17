@@ -108,7 +108,7 @@ public class Tile extends DimensionElement
 		}
 		catch(Exception ex)
 		{
-			System.err.println("Failed to decode tile: " + encoded);
+			Logger.err("Failed to decode tile: " + encoded);
 			ex.printStackTrace();
 			return null;
 		}
@@ -129,7 +129,7 @@ public class Tile extends DimensionElement
 		}
 		catch(Exception ex)
 		{
-			System.err.println("Failed to load tile: " + file);
+			Logger.err("Failed to load tile: " + file);
 			ex.printStackTrace();
 		}
 		finally
@@ -188,7 +188,7 @@ public class Tile extends DimensionElement
 		}
 		catch(Exception ex)
 		{
-			System.err.println("Failed to process event (Action: " + te.getAction() + ", Value = " + te.getValue() + ")!");
+			Logger.err("Failed to process event (Action: " + te.getAction() + ", Value = " + te.getValue() + ")!");
 			ex.printStackTrace();
 		}
 	}
@@ -292,6 +292,10 @@ public class Tile extends DimensionElement
 		this.durability = durability;
 	}
 
+	/**
+	 * Render over player?
+	 * @return
+	 */
 	public boolean hasRenderPriority()
 	{
 		return this.renderPriority;

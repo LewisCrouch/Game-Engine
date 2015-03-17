@@ -7,6 +7,7 @@ import lewiscrouch.lib.display.Display;
 import lewiscrouch.lib.display.RenderQueue;
 import lewiscrouch.lib.display.renderable.RRectangle;
 import lewiscrouch.lib.display.renderable.RString;
+import lewiscrouch.lib.util.Logger;
 
 public class GuiMainMenu extends GuiScreen
 {
@@ -75,7 +76,7 @@ public class GuiMainMenu extends GuiScreen
 				this.displayScreen(new GuiIngame());
 				break;
 			case 2:
-				System.out.println("Load Game");
+				Logger.info("Load Game");
 				break;
 			case 3:
 				this.displayScreen(new GuiOptions());

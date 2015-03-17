@@ -4,6 +4,7 @@ import lewiscrouch.ge.client.gui.GuiMainMenu;
 import lewiscrouch.ge.client.gui.GuiScreen;
 import lewiscrouch.lib.display.Display;
 import lewiscrouch.lib.display.ResizeListener;
+import lewiscrouch.lib.resource.ImageRegister;
 import lewiscrouch.lib.util.TimeConverter;
 
 public class Game
@@ -36,6 +37,8 @@ public class Game
 		this.updates = 0;
 		this.seconds = 0;
 		this.currentUPS = 0;
+
+		this.registerTextures();
 
 		this.displayScreen(new GuiMainMenu());
 
@@ -115,6 +118,13 @@ public class Game
 		}
 
 		if(this.currentScreen != null) this.currentScreen.onResize();
+	}
+
+	public void registerTextures()
+	{
+		/* 01 */ ImageRegister.registerImage("grass.png");
+		/* 02 */ ImageRegister.registerImage("water.png");
+		/* 03 */ ImageRegister.registerImage("player.png");
 	}
 
 	public String getName()

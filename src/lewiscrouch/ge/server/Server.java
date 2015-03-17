@@ -29,7 +29,7 @@ public class Server
 		this.onlineClients = new ArrayList<ClientListener>();
 
 		this.dimensions = new Dimension[1];
-		this.dimensions[0] = new Dimension("MyDim", 1);
+		this.dimensions[0] = new Dimension("MyDim");
 
 		this.running = false;
 	}

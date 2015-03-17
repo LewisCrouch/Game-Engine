@@ -282,7 +282,7 @@ public class ClientListener extends Thread
 						String data = Base64.encodeFromFile(child.getAbsolutePath());
 						this.output.writeObject(new Packet("res_img_" + child.getName(), data));
 					}
-					else if(ext.equalsIgnoreCase("tile"))
+					else if(ext.equalsIgnoreCase("tm"))
 					{
 						BufferedReader reader = null;
 						try
@@ -292,7 +292,7 @@ public class ClientListener extends Thread
 							String line = null;
 							while((line = reader.readLine()) != null)
 							{
-								this.output.writeObject(new Packet("res_tile_" + child.getName(), line));
+								this.output.writeObject(new Packet("res_tm_" + child.getName(), line));
 								break;
 							}
 						}

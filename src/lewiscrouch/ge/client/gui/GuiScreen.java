@@ -13,7 +13,7 @@ import lewiscrouch.lib.resource.ImageRegister;
 
 public abstract class GuiScreen
 {
-	private static final int DEFAULT_BACKGROUND_ID = ImageRegister.registerImage("brick_floor.png");
+	private static final int DEFAULT_BACKGROUND_ID = ImageRegister.registerImage("cobble_path.png");
 
 	private List<GuiControl> controls;
 	private GuiSubScreen subScreen;

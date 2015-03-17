@@ -8,6 +8,7 @@ import lewiscrouch.lib.display.Display;
 import lewiscrouch.lib.display.Keyboard;
 import lewiscrouch.lib.display.RenderQueue;
 import lewiscrouch.lib.display.renderable.RRectangle;
+import lewiscrouch.lib.util.Logger;
 
 public class GuiIngameMenu extends GuiSubScreen
 {
@@ -57,7 +58,7 @@ public class GuiIngameMenu extends GuiSubScreen
 				this.setVisible(false);
 				break;
 			case 2:
-				System.out.println("TODO: SAVE GAME");
+				Logger.info("TODO: SAVE GAME");
 				break;
 			case 3:
 				this.getParent().setSubScreen(new GuiIngameOptions(this.getParent()));

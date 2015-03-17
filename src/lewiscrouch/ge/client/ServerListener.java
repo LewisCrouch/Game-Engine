@@ -36,7 +36,7 @@ public class ServerListener extends Thread
 				{
 					Base64.decodeToFile(msg.getValue().toString(), ResourceManager.getResourcePath(path + msg.getKey().substring(start.length())));
 				}
-				else if(msg.getKey().startsWith(start = "res_tile_"))
+				else if(msg.getKey().startsWith(start = "res_tm_"))
 				{
 					PrintWriter out = new PrintWriter(ResourceManager.getResourceFile(path + msg.getKey().substring(start.length()) + ".tile"));
 					out.println(msg.getValue().toString());
