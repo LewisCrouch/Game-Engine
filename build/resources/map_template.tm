@@ -1,0 +1,9 @@
+i1 i1 i1 i1 i1 i1 i1 i1 i1
+i1 i1 i1 i1 i1 i1 i1 i1 i1
+i1 i1 i1 i1 i1 i1 i1 i1 i1
+i1 i1 i1 i0 i0 i0 i1 i1 i1
+i1 i1 i1 i0 i2,g0 i0 i1 i1 i1
+i1 i1 i1 i0 i0 i0 i1 i1 i1
+i1 i1 i1 i1 i1 i1 i1 i1 i1
+i1 i1 i1 i1 i1 i1 i1 i1 i1
+i1 i1 i1 i1 i1 i1 i1 i1 i1
