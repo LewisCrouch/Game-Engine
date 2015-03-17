@@ -1,38 +1,107 @@
 package lewiscrouch.ge.common.dimension;
 
-public class Entity
+import lewiscrouch.lib.dimension.Direction;
+import lewiscrouch.lib.geom.Point;
+
+public abstract class Entity extends DimensionElement
 {
-	private int dimensionX;
-	private int dimensionY;
+	private int imageID;
 
-	public Entity(int dimensionX, int dimensionY)
+	private boolean moving;
+	private Direction moveDirection;
+	private int moveTime;
+	private int maxMoveTime;
+
+	private boolean swimming;
+
+	public Entity(Dimension dimension, Point dimensionCoords)
 	{
-		this.dimensionX = dimensionX;
-		this.dimensionY = dimensionY;
+		super(dimension, dimensionCoords);
+
+		this.imageID = 0;
+
+		this.moving = false;
+		this.moveDirection = Direction.NORTH;
 	}
 
-	public double distance(int x, int y)
+	public void update()
 	{
-		return Math.sqrt((this.dimensionX - x) * (this.dimensionX - x) + (this.dimensionY - y) * (this.dimensionY - y));
+		if(this.moving)
+		{
+			if(--this.moveTime <= 0)
+			{
+				this.moving = false;
+				this.moveTime = this.maxMoveTime;
+				if(this.moveDirection.compare(Direction.NORTH)) this.getDimensionCoords().decrementY(1);
+				if(this.moveDirection.compare(Direction.EAST)) this.getDimensionCoords().incrementX(1);;
+				if(this.moveDirection.compare(Direction.SOUTH)) this.getDimensionCoords().incrementY(1);;
+				if(this.moveDirection.compare(Direction.WEST)) this.getDimensionCoords().decrementX(1);;
+			}
+		}
 	}
 
-	public int getDimensionX()
+	public void move(Direction drc)
 	{
-		return this.dimensionX;
+		if(!this.moving && this.getDimension().canMoveInDirection(this.getDimensionCoords(), drc))
+		{
+			this.moveTime = this.maxMoveTime;
+			this.moving = true;
+			this.moveDirection = drc;
+		}
 	}
 
-	public void setDimensionX(int dimensionX)
+	public void moveUp()
 	{
-		this.dimensionX = dimensionX;
+		this.move(Direction.NORTH);
 	}
 
-	public int getDimensionY()
+	public void moveRight()
 	{
-		return this.dimensionY;
+		this.move(Direction.EAST);
 	}
 
-	public void setDimensionY(int dimensionY)
+	public void moveDown()
 	{
-		this.dimensionY = dimensionY;
+		this.move(Direction.SOUTH);
+	}
+
+	public void moveLeft()
+	{
+		this.move(Direction.WEST);
+	}
+
+	public boolean isMoving()
+	{
+		return this.moving;
+	}
+
+	public Direction getMoveDirection()
+	{
+		return this.moveDirection;
+	}
+
+	public int getMoveTime()
+	{
+		return this.moveTime;
+	}
+
+	public int getMaxMoveTime()
+	{
+		return this.maxMoveTime;
+	}
+
+	public boolean isSwimming()
+	{
+		return this.swimming;
+	}
+
+	public void setSwimming(boolean swimming)
+	{
+		this.swimming = true;
+	}
+
+	public int getImageID()
+	{
+		return this.imageID;
 	}
 }

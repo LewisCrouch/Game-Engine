@@ -1,5 +1,8 @@
 package lewiscrouch.ge.server;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -7,6 +10,9 @@ import java.net.Socket;
 
 import lewiscrouch.ge.common.Packet;
 import lewiscrouch.ge.common.Session;
+import lewiscrouch.lib.resource.ResourceManager;
+import lewiscrouch.lib.util.Base64;
+import lewiscrouch.lib.util.FilenameUtils;
 import lewiscrouch.lib.util.Logger;
 
 public class ClientListener extends Thread
@@ -57,6 +63,10 @@ public class ClientListener extends Thread
 								if(key != null)
 								{
 									this.session = new Session(key, username);
+
+									Logger.info("Sending resources to client with username " + username + ".");
+									this.msgClient("Attempting to download resources from server.");
+									if(!this.sendResources()) this.msgClient("Resources may not have been downloaded successfully!");
 
 									Logger.info("Client with username " + username + " connected.");
 									this.server.messageAllClients(username + " connected.");
@@ -246,6 +256,82 @@ public class ClientListener extends Thread
 		}
 
 		return true;
+	}
+
+	public boolean sendResources()
+	{
+		boolean success = true;
+
+		File dir = new File(ResourceManager.RESOURCE_DIR);
+		File[] directoryListing = dir.listFiles();
+		if(directoryListing != null)
+		{
+			for(File child : directoryListing)
+			{
+				if(!this.socket.isConnected())
+				{
+					this.close();
+					return false;
+				}
+
+				try
+				{
+					String ext = FilenameUtils.getFileExtension(child);
+					if(ext.equalsIgnoreCase("png"))
+					{
+						String data = Base64.encodeFromFile(child.getAbsolutePath());
+						this.output.writeObject(new Packet("res_img_" + child.getName(), data));
+					}
+					else if(ext.equalsIgnoreCase("tile"))
+					{
+						BufferedReader reader = null;
+						try
+						{
+							reader = new BufferedReader(new FileReader(child));
+
+							String line = null;
+							while((line = reader.readLine()) != null)
+							{
+								this.output.writeObject(new Packet("res_tile_" + child.getName(), line));
+								break;
+							}
+						}
+						catch(Exception ex)
+						{
+							Logger.err("Error sending resource to " + this.session.getUsername() + ": " + ex);
+							success = false;
+						}
+						finally
+						{
+							if(reader != null)
+							{
+								try
+								{
+									reader.close();
+								}
+								catch(IOException ex)
+								{
+									
+								}
+							}
+						}
+					}
+				}
+				catch(IOException ex)
+				{
+					Logger.err("Error sending resource to " + this.session.getUsername() + ": " + ex);
+					success = false;
+				}
+			}
+		}
+		else
+		{
+			Logger.info("Could not find resources to send to client.");
+
+			success = false;
+		}
+
+		return success;
 	}
 
 	private void close()

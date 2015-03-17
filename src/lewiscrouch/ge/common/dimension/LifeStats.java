@@ -2,15 +2,21 @@ package lewiscrouch.ge.common.dimension;
 
 public class LifeStats
 {
+	private Entity entity;
+
 	private int health;
 	private int maxHealth;
-	private boolean dead;
 
-	public LifeStats(int health)
+	public LifeStats(Entity entity, int health)
 	{
+		this.entity = entity;
 		this.health = health;
 		this.maxHealth = health;
-		this.dead = false;
+	}
+
+	public void update()
+	{
+		if(this.isDead()) this.entity.setDead(true);
 	}
 
 	public void heal(int amount)
@@ -32,6 +38,11 @@ public class LifeStats
 	public void kill()
 	{
 		this.health = 0;
+	}
+
+	public Entity getEntity()
+	{
+		return this.entity;
 	}
 
 	public int getHealth()
@@ -56,11 +67,6 @@ public class LifeStats
 
 	public boolean isDead()
 	{
-		return this.dead;
-	}
-
-	public void setDead(boolean dead)
-	{
-		this.dead = dead;
+		return this.health <= 0;
 	}
 }

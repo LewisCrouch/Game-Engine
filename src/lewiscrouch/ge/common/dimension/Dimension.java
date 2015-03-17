@@ -3,12 +3,13 @@ package lewiscrouch.ge.common.dimension;
 import java.util.ArrayList;
 import java.util.List;
 
+import lewiscrouch.lib.dimension.Direction;
+import lewiscrouch.lib.geom.Point;
+
 public class Dimension
 {
 	private String title;
 
-	private int scale;
-	private List<Chunk> chunks;
 	private List<Entity> entities; // virtual
 	private List<Tile> tiles; // physical
 
@@ -16,61 +17,29 @@ public class Dimension
 	{
 		this.title = title;
 
-		this.scale = scale;
-		if(this.scale < 1) this.scale = 1;
-
-		this.chunks = new ArrayList<Chunk>();
 		this.entities = new ArrayList<Entity>();
 		this.tiles = new ArrayList<Tile>();
-
-		Chunk initial = new Chunk(0, 0);
-		this.chunks.add(initial);
-
-		int tempScale = this.scale;
-		while(tempScale > 0)
-		{
-			int tempScaleX = tempScale;
-			int tempScaleY = tempScale;
-			for(int i = -tempScaleX; i < tempScaleX; i++)
-			{
-				for(int j = -tempScaleY; j < tempScaleY; j++)
-				{
-					this.createChunkIfEmpty(initial.getChunkX() + i, initial.getChunkY() + j);
-					this.createChunkIfEmpty(initial.getChunkX() - i, initial.getChunkY() - j);
-				}
-			}
-			tempScale--;
-		}
 	}
 
-	public boolean chunkExists(int x, int y)
+	public boolean tileExists(int x, int y)
 	{
-		for(Chunk chunk : this.chunks)
+		for(Tile tile : this.tiles)
 		{
-			if(chunk.getChunkX() == x)
+			if(tile.getDimensionCoords().equalTo(new Point(x, y)))
 			{
-				if(chunk.getChunkY() == y)
-				{
-					return true;
-				}
+				return true;
 			}
 		}
 		return false;
 	}
 
-	public void createChunkIfEmpty(int x, int y)
+	public boolean canMoveInDirection(Point dimensionCoords, Direction drc)
 	{
-		if(!this.chunkExists(x, y)) this.chunks.add(new Chunk(x, y));
-	}
-
-	public int getScale()
-	{
-		return this.scale;
-	}
-
-	public List<Chunk> getChunks()
-	{
-		return this.chunks;
+		if(drc.compare(Direction.NORTH)) return this.tileExists(dimensionCoords.getX(), dimensionCoords.getY() - 1);
+		if(drc.compare(Direction.EAST)) return this.tileExists(dimensionCoords.getX() + 1, dimensionCoords.getY());
+		if(drc.compare(Direction.SOUTH)) return this.tileExists(dimensionCoords.getX(), dimensionCoords.getY() + 1);
+		if(drc.compare(Direction.WEST)) return this.tileExists(dimensionCoords.getX() - 1, dimensionCoords.getY());
+		return false;
 	}
 
 	public List<Entity> getEntities()

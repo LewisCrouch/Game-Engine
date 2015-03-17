@@ -1,18 +1,20 @@
 package lewiscrouch.ge.common.dimension;
 
+import lewiscrouch.lib.geom.Point;
+
 public class Player extends Entity
 {
-	private String key;
-
 	private LifeStats lifeStats;
+	private Inventory inventory;
 
-	public Player(String key, int dimensionX, int dimensionY)
+	public Player(String name, Dimension dimension, Point dimensionCoords)
 	{
-		super(dimensionX, dimensionY);
+		super(dimension, dimensionCoords);
 
-		this.key = key;
+		this.setName(name);
 
-		this.lifeStats = new LifeStats(100);
+		this.lifeStats = new LifeStats(this, 100);
+		this.inventory = new Inventory(10);
 	}
 
 	public LifeStats getLifeStats()
@@ -25,8 +27,8 @@ public class Player extends Entity
 		this.lifeStats = lifeStats;
 	}
 
-	public String getKey()
+	public Inventory getInventory()
 	{
-		return this.key;
+		return this.inventory;
 	}
 }
