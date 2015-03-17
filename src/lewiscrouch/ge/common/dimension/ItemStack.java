@@ -2,21 +2,26 @@ package lewiscrouch.ge.common.dimension;
 
 public class ItemStack
 {
-	private int itemID;
+	private Item item;
 
 	private int stackSize;
 	private int maxStackSize;
 
-	public ItemStack(int itemID)
+	public ItemStack(Item item)
 	{
-		this.itemID = itemID;
+		this.item = item;
 		this.stackSize = 1;
 		this.maxStackSize = 100;
 	}
 
-	public int getItemID()
+	public void removeStack()
 	{
-		return this.itemID;
+		this.stackSize--;
+	}
+
+	public Item getItem()
+	{
+		return this.item;
 	}
 
 	public int getStackSize()
@@ -37,10 +42,5 @@ public class ItemStack
 	public void setMaxStackSize(int maxStackSize)
 	{
 		this.maxStackSize = maxStackSize;
-	}
-
-	public Item getItem()
-	{
-		return Items.getItem(this.itemID);
 	}
 }
