@@ -1,7 +1,12 @@
 package lewiscrouch.ge.common.dimension;
 
+import java.io.Serializable;
+
 public class ItemStack
+	implements Serializable
 {
+	private static final long serialVersionUID = 5013560270750006481L;
+
 	private Item item;
 
 	private int stackSize;

@@ -1,5 +1,7 @@
 package lewiscrouch.ge.common;
 
+import lewiscrouch.ge.common.packet.IPacket;
+
 public class GlobalPacketHandler
 	implements IPacketHandler
 {
@@ -23,5 +25,5 @@ public class GlobalPacketHandler
 	}
 
 	@Override
-	public void handlePacket(Packet packet) { }
+	public void handlePacket(IPacket packet) { }
 }

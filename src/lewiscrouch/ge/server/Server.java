@@ -7,29 +7,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lewiscrouch.ge.common.ServerInfo;
-import lewiscrouch.ge.common.Session;
 import lewiscrouch.ge.common.dimension.Dimension;
+import lewiscrouch.ge.common.dimension.Player;
 import lewiscrouch.lib.util.Logger;
-import lewiscrouch.lib.util.UniqueKey;
 
 public class Server
 {
 	private ServerInfo serverInfo;
-	private List<ServerSession> registeredClients;
-	private List<ClientListener> onlineClients;
+	private List<Connection> connections;
+
+	private List<Registration> registeredPlayers;
+	private List<Player> players;
 
 	private Dimension[] dimensions;
+	private int dimension;
 
 	private boolean running;
 
 	public Server(ServerInfo serverInfo)
 	{
 		this.serverInfo = serverInfo;
-		this.registeredClients = new ArrayList<ServerSession>();
-		this.onlineClients = new ArrayList<ClientListener>();
+		this.connections = new ArrayList<Connection>();
+
+		this.registeredPlayers = new ArrayList<Registration>();
+		this.players = new ArrayList<Player>();
 
 		this.dimensions = new Dimension[1];
-		this.dimensions[0] = new Dimension("MyDim");
+		this.dimensions[this.dimension = 0] = new Dimension("Template");
 
 		this.running = false;
 	}
@@ -50,28 +54,28 @@ public class Server
 
 				if(!this.running) break;
 
-				ClientListener cl = new ClientListener(this, socket);
-				if(!cl.isDisconnected())
+				Connection conn = new Connection(this, socket);
+				if(!conn.isDisconnected())
 				{
-					cl.start();
+					conn.start();
 				}
 				else
 				{
-					this.onlineClients.remove(cl);
+					this.connections.remove(conn);
 				}
 			}
 
 			try
 			{
 				serverSocket.close();
-				for(int i = 0; i < this.onlineClients.size(); i++)
+				for(int i = 0; i < this.connections.size(); i++)
 				{
-					ClientListener cl = this.onlineClients.get(i);
+					Connection conn = this.connections.get(i);
 					try
 					{
-						cl.getObjectInputStream().close();
-						cl.getObjectOutputStream().close();
-						cl.getSocket().close();
+						conn.getObjectInputStream().close();
+						conn.getObjectOutputStream().close();
+						conn.getSocket().close();
 					}
 					catch(IOException ex)
 					{
@@ -104,11 +108,11 @@ public class Server
 		}
 	}
 
-	public boolean clientExists(String username)
+	public boolean isRegistered(String username)
 	{
-		for(Session client : this.registeredClients)
+		for(Registration reg : this.registeredPlayers)
 		{
-			if(client.getUsername().equalsIgnoreCase(username))
+			if(reg.getUsername().equalsIgnoreCase(username))
 			{
 				return true;
 			}
@@ -116,11 +120,11 @@ public class Server
 		return false;
 	}
 
-	public boolean isClientOnline(String username)
+	public boolean isOnline(String username)
 	{
-		for(ClientListener client : this.onlineClients)
+		for(Connection conn : this.connections)
 		{
-			if(client.getSession().getUsername().equalsIgnoreCase(username))
+			if(conn.getUsername().equalsIgnoreCase(username))
 			{
 				return true;
 			}
@@ -128,76 +132,68 @@ public class Server
 		return false;
 	}
 
-	public ServerSession getClientByUsername(String username)
+	public Registration getPlayerRegistration(String username)
 	{
-		for(ServerSession client : this.registeredClients)
+		for(Registration reg : this.registeredPlayers)
 		{
-			if(client.getUsername().equalsIgnoreCase(username)) return client;
+			if(reg.getUsername().equalsIgnoreCase(username)) return reg;
 		}
 		return null;
 	}
 
-	public ClientListener getOnlineClientByUsername(String username)
+	public Connection getConnection(String username)
 	{
-		for(ClientListener client : this.onlineClients)
+		for(Connection conn : this.connections)
 		{
-			if(client.getSession().getUsername().equalsIgnoreCase(username)) return client;
+			if(conn.getUsername().equalsIgnoreCase(username)) return conn;
 		}
 		return null;
 	}
 
-	public ServerSession getClientByKey(String key)
+	public Player getPlayer(String username)
 	{
-		for(ServerSession client : this.registeredClients)
+		for(Player player : this.players)
 		{
-			if(client.toString().equalsIgnoreCase(key)) return client;
+			if(player.getName().equalsIgnoreCase(username)) return player;
 		}
 		return null;
 	}
 
-	public ClientListener getOnlineClientByKey(String key)
+	public boolean registerPlayer(String username, String password)
 	{
-		for(ClientListener client : this.onlineClients)
-		{
-			if(client.getSession().toString().equalsIgnoreCase(key)) return client;
-		}
-		return null;
-	}
+		if(this.isRegistered(username)) return false;
 
-	public boolean registerClient(String username, String password)
-	{
-		if(this.clientExists(username)) return false;
-
-		this.registeredClients.add(new ServerSession(UniqueKey.genKey(), username, password));
+		this.registeredPlayers.add(new Registration(username, password));
+		this.players.add(new Player(username, this.getDimension(), this.getDimension().getSpawnPoint()));
 		return true;
 	}
 
-	public String loginClient(String username, String password, ClientListener cl)
+	public Player loginPlayer(String username, String password, Connection conn)
 	{
-		if(this.isClientOnline(username)) return null;
+		if(this.isOnline(username)) return null;
 
-		ServerSession client = this.getClientByUsername(username);
-		if(client.getPassword().equals(password))
+		Registration reg = this.getPlayerRegistration(username);
+		if(reg.getPassword().equals(password))
 		{
-			this.onlineClients.add(cl);
-			return client.toString();
+			this.connections.add(conn);
+			return this.getPlayer(username);
 		}
 		return null;
 	}
 
-	public boolean logoutClient(String username, String reason)
+	public boolean logoutPlayer(String username, String reason)
 	{
-		if(!this.isClientOnline(username)) return false;
+		if(!this.isOnline(username)) return false;
 
-		for(int i = 0; i < this.onlineClients.size(); ++i)
+		for(int i = 0; i < this.connections.size(); ++i)
 		{
-			ClientListener cl = this.onlineClients.get(i);
+			Connection conn = this.connections.get(i);
 
-			if(cl.getSession().getUsername().equalsIgnoreCase(username))
+			if(conn.getUsername().equalsIgnoreCase(username))
 			{
-				Logger.info(cl.getSession().getUsername() + " disconnected: " + reason);
-				this.onlineClients.remove(i);
-				this.messageAllClients(cl.getSession().getUsername() + " disconnected.");
+				Logger.info(conn.getUsername() + " disconnected: " + reason);
+				this.connections.remove(i);
+				this.alertAllPlayers(conn.getUsername() + " disconnected.");
 				return true;
 			}
 		}
@@ -205,16 +201,21 @@ public class Server
 		return false;
 	}
 
-	public void messageAllClients(String msg)
+	public void messageAllPlayers(String sender, String msg)
 	{
-		for(int i = this.onlineClients.size(); --i >= 0;)
+		for(int i = this.connections.size(); --i >= 0;)
 		{
-			ClientListener cl = this.onlineClients.get(i);
-			if(!cl.msgClient(msg))
-			{
-				this.onlineClients.remove(i);
-				this.logoutClient(cl.getSession().getUsername(), "disconnected");
-			}
+			Connection conn = this.connections.get(i);
+			conn.sendMessage(sender, msg);
+		}
+	}
+
+	public void alertAllPlayers(String msg)
+	{
+		for(int i = this.connections.size(); --i >= 0;)
+		{
+			Connection conn = this.connections.get(i);
+			conn.sendAlert(msg);
 		}
 	}
 
@@ -223,19 +224,61 @@ public class Server
 		return this.serverInfo;
 	}
 
-	public List<ServerSession> getRegisteredClients()
+	public List<Connection> getConnections()
 	{
-		return this.registeredClients;
+		return this.connections;
 	}
 
-	public List<ClientListener> getOnlineClients()
+	public List<Registration> getRegisteredPlayers()
 	{
-		return this.onlineClients;
+		return this.registeredPlayers;
+	}
+
+	public List<Player> getPlayers()
+	{
+		return this.players;
+	}
+
+	public List<Player> getOnlinePlayers()
+	{
+		List<Player> onlinePlayers = new ArrayList<Player>();
+		for(Player player : this.players)
+		{
+			if(this.isOnline(player.getName()))
+			{
+				onlinePlayers.add(player);
+			}
+		}
+		return onlinePlayers;
+	}
+
+	public String getOnlinePlayersStr()
+	{
+		String onlinePlayers = "Online players: ";
+		boolean first = true;
+		for(Player player : this.getOnlinePlayers())
+		{
+			if(first)
+			{
+				onlinePlayers += player.getName();
+				first = false;
+			}
+			else
+			{
+				onlinePlayers += ", " + player.getName();
+			}
+		}
+		return onlinePlayers;
 	}
 
 	public Dimension[] getDimensions()
 	{
 		return this.dimensions;
+	}
+
+	public Dimension getDimension()
+	{
+		return this.dimensions[this.dimension];
 	}
 
 	public boolean isRunning()

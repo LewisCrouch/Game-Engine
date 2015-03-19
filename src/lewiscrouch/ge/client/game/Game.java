@@ -1,14 +1,23 @@
 package lewiscrouch.ge.client.game;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import lewiscrouch.ge.client.Client;
+import lewiscrouch.ge.client.IServerListener;
 import lewiscrouch.ge.client.gui.GuiMainMenu;
 import lewiscrouch.ge.client.gui.GuiScreen;
+import lewiscrouch.ge.common.dimension.Player;
+import lewiscrouch.ge.common.packet.IPacket;
+import lewiscrouch.ge.common.packet.PacketPlayer;
 import lewiscrouch.lib.display.Display;
 import lewiscrouch.lib.display.ResizeListener;
 import lewiscrouch.lib.resource.ImageRegister;
+import lewiscrouch.lib.util.Logger;
 import lewiscrouch.lib.util.TimeConverter;
 
 public class Game
-	implements ResizeListener
+	implements ResizeListener, IServerListener
 {
 	public static int SCALE = 5;
 	public static int SIZE = 16;
@@ -25,7 +34,11 @@ public class Game
 	private int seconds;
 	private int currentUPS;
 
+	private Client client;
 	private GuiScreen currentScreen;
+
+	private Player player;
+	private List<Player> otherPlayers;
 
 	public Game()
 	{
@@ -39,6 +52,14 @@ public class Game
 		this.currentUPS = 0;
 
 		this.registerTextures();
+
+		this.otherPlayers = new ArrayList<Player>();
+
+//		String username = "Player" + RandomFactory.getInstance().nextInt(999);
+//		this.client = new Client(new ServerInfo("localhost", 1337));
+//		this.client.addServerListener(this);
+//		this.client.start();
+//		this.client.sendPacket(new PacketRegister(username, "password"));
 
 		this.displayScreen(new GuiMainMenu());
 
@@ -120,11 +141,55 @@ public class Game
 		if(this.currentScreen != null) this.currentScreen.onResize();
 	}
 
+	@Override
+	public void receivePacket(IPacket p)
+	{
+		try
+		{
+			if(p instanceof PacketPlayer)
+			{
+				PacketPlayer pp = (PacketPlayer) p;
+				this.player = pp.getPlayer();
+			}
+		}
+		catch(Exception ex)
+		{
+			Logger.err("Failed to handle packet: " + ex);
+		}
+	}
+
 	public void registerTextures()
 	{
 		/* 01 */ ImageRegister.registerImage("grass.png");
 		/* 02 */ ImageRegister.registerImage("water.png");
 		/* 03 */ ImageRegister.registerImage("player.png");
+	}
+
+	public List<Player> getOtherPlayers()
+	{
+		return this.otherPlayers;
+	}
+
+	public Player getOtherPlayer(String username)
+	{
+		for(Player player : this.otherPlayers)
+		{
+			if(player.getName().equalsIgnoreCase(username))
+			{
+				return player;
+			}
+		}
+		return null;
+	}
+
+	public Player getPlayer()
+	{
+		return this.player;
+	}
+
+	public void setPlayer(Player player)
+	{
+		this.player = player;
 	}
 
 	public String getName()
@@ -175,6 +240,11 @@ public class Game
 	public void displayScreen(GuiScreen currentScreen)
 	{
 		this.currentScreen = currentScreen;
+	}
+
+	public Client getClient()
+	{
+		return this.client;
 	}
 
 	public static Game getInstance()

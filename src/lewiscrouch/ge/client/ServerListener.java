@@ -2,9 +2,9 @@ package lewiscrouch.ge.client;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 
-import lewiscrouch.ge.common.Packet;
+import lewiscrouch.ge.common.packet.IPacket;
+import lewiscrouch.ge.common.packet.PacketResource;
 import lewiscrouch.lib.resource.ResourceManager;
 import lewiscrouch.lib.util.Base64;
 import lewiscrouch.lib.util.Logger;
@@ -25,26 +25,24 @@ public class ServerListener extends Thread
 		{
 			try
 			{
-				Packet msg = (Packet) this.client.getObjectInputStream().readObject();
+				IPacket p = (IPacket) this.client.getObjectInputStream().readObject();
 
-				File dir = ResourceManager.getResourceFile(this.client.getServerInfo().getHost());
-				if(!dir.exists()) dir.mkdir();
+				if(p instanceof PacketResource)
+				{
+					PacketResource pr = (PacketResource) p;
 
-				String path = this.client.getServerInfo().getHost() + "/";
-				String start = "";
-				if(msg.getKey().startsWith(start = "res_img_"))
-				{
-					Base64.decodeToFile(msg.getValue().toString(), ResourceManager.getResourcePath(path + msg.getKey().substring(start.length())));
-				}
-				else if(msg.getKey().startsWith(start = "res_tm_"))
-				{
-					PrintWriter out = new PrintWriter(ResourceManager.getResourceFile(path + msg.getKey().substring(start.length()) + ".tile"));
-					out.println(msg.getValue().toString());
-					out.close();
+					File dir = ResourceManager.getResourceFile(this.client.getServerInfo().getHost());
+					if(!dir.exists()) dir.mkdir();
+	
+					String path = this.client.getServerInfo().getHost() + "/";
+					Base64.decodeToFile(pr.getData(), path + pr.getFilename());
 				}
 				else
 				{
-					Logger.info(msg.getValue().toString());
+					for(IServerListener sl : this.client.getServerListeners())
+					{
+						sl.receivePacket(p);
+					}
 				}
 			}
 			catch(IOException ex)

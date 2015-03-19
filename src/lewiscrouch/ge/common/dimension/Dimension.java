@@ -13,12 +13,15 @@ public class Dimension
 	private List<Entity> entities; // virtual
 	private List<Tile> tiles; // physical
 
+	private Point spawnPoint;
+
 	public Dimension(String title)
 	{
 		this.title = title;
 
 		this.entities = new ArrayList<Entity>();
 		this.tiles = new MapLoader(this, "map_" + title.toLowerCase() + ".tm").loadMap();
+		this.spawnPoint = new Point(0, 0);
 	}
 
 	public boolean tileExists(int x, int y)
@@ -55,5 +58,10 @@ public class Dimension
 	public String getTitle()
 	{
 		return this.title;
+	}
+
+	public Point getSpawnPoint()
+	{
+		return this.spawnPoint;
 	}
 }

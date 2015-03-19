@@ -69,4 +69,10 @@ public class LifeStats
 	{
 		return this.health <= 0;
 	}
+
+	@Override
+	public String toString()
+	{
+		return this.health + ";" + this.maxHealth;
+	}
 }

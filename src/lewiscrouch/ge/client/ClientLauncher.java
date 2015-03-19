@@ -1,7 +1,11 @@
 package lewiscrouch.ge.client;
 
-import lewiscrouch.ge.common.Packet;
 import lewiscrouch.ge.common.ServerInfo;
+import lewiscrouch.ge.common.packet.PacketLogin;
+import lewiscrouch.ge.common.packet.PacketLogout;
+import lewiscrouch.ge.common.packet.PacketPlayerMessage;
+import lewiscrouch.ge.common.packet.PacketRegister;
+import lewiscrouch.ge.common.packet.PacketWho;
 import lewiscrouch.lib.console.Input;
 import lewiscrouch.lib.util.Logger;
 import lewiscrouch.lib.validation.StringConstraints;
@@ -37,7 +41,7 @@ public class ClientLauncher
 			sc.setMinLength(6);
 			String password = Input.forceReadStr(sc, "Must be at least 6 characters long!");
 
-			client.sendPacket(new Packet("register", username + ":" + password));
+			client.sendPacket(new PacketRegister(username, password));
 		}
 		else
 		{
@@ -49,7 +53,7 @@ public class ClientLauncher
 			Logger.info("Enter password:");
 			String password = Input.readStr();
 
-			client.sendPacket(new Packet("login", username + ":" + password));
+			client.sendPacket(new PacketLogin(username, password));
 		}
 
 		while(true)
@@ -60,18 +64,18 @@ public class ClientLauncher
 				String cmd = msg.substring(1);
 				if(cmd.equalsIgnoreCase("who"))
 				{
-					client.sendPacket(new Packet("who", ""));
+					client.sendPacket(new PacketWho());
 				}
 				else if(cmd.equalsIgnoreCase("logout"))
 				{
-					client.sendPacket(new Packet("logout", ""));
+					client.sendPacket(new PacketLogout());
 					client.disconnect();
 					System.exit(0);
 				}
 			}
 			else
 			{
-				client.sendPacket(new Packet("msg", msg));
+				client.sendPacket(new PacketPlayerMessage(msg));
 			}
 		}
 	}

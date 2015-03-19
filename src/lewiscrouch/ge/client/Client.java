@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
-import lewiscrouch.ge.common.Packet;
 import lewiscrouch.ge.common.ServerInfo;
+import lewiscrouch.ge.common.packet.IPacket;
 import lewiscrouch.lib.util.Logger;
 
 public class Client
@@ -17,9 +19,12 @@ public class Client
 
 	private ServerInfo serverInfo;
 
+	private List<IServerListener> serverListeners;
+
 	public Client(ServerInfo serverInfo)
 	{
 		this.serverInfo = serverInfo;
+		this.serverListeners = new ArrayList<IServerListener>();
 	}
 
 	public boolean start()
@@ -52,7 +57,7 @@ public class Client
 		return true;
 	}
 
-	public void sendPacket(Packet p)
+	public void sendPacket(IPacket p)
 	{
 		try
 		{
@@ -91,6 +96,11 @@ public class Client
 		}
 	}
 
+	public void addServerListener(IServerListener serverListener)
+	{
+		this.serverListeners.add(serverListener);
+	}
+
 	public Socket getSocket()
 	{
 		return this.socket;
@@ -109,5 +119,10 @@ public class Client
 	public ServerInfo getServerInfo()
 	{
 		return this.serverInfo;
+	}
+
+	public List<IServerListener> getServerListeners()
+	{
+		return this.serverListeners;
 	}
 }
