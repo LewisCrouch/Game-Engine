@@ -70,9 +70,26 @@ public class LifeStats
 		return this.health <= 0;
 	}
 
-	@Override
-	public String toString()
+	public String encode()
 	{
 		return this.health + ";" + this.maxHealth;
+	}
+
+	public static LifeStats decode(Entity entity, String data)
+		throws Exception
+	{
+		try
+		{
+			String[] parts = data.split(";");
+			int health = Integer.parseInt(parts[0]);
+			int maxHealth = Integer.parseInt(parts[1]);
+			LifeStats ls = new LifeStats(entity, health);
+			ls.setMaxHealth(maxHealth);
+			return ls;
+		}
+		catch(Exception ex)
+		{
+			throw ex;
+		}
 	}
 }

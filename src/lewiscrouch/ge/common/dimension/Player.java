@@ -31,14 +31,4 @@ public class Player extends Entity
 	{
 		return this.inventory;
 	}
-
-	@Override
-	public String toString()
-	{
-		String dimension = this.getDimension().getTitle();
-		String player = this.getImageID() + ";" + this.getDimensionCoords().getX() + ";" + this.getDimensionCoords().getY();
-		String lifeStats = this.lifeStats.toString();
-		String inventory = this.inventory.toString();
-		return dimension + " " + player + " " + lifeStats + " " + inventory;
-	}
 }

@@ -1,5 +1,12 @@
 package lewiscrouch.ge.common.dimension;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+import lewiscrouch.lib.util.Base64;
+
 public class Inventory
 {
 	private ItemStack[] items;
@@ -58,5 +65,53 @@ public class Inventory
 	public ItemStack[] getItems()
 	{
 		return this.items;
+	}
+
+	public String encode()
+		throws Exception
+	{
+		try
+		{
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(out);
+
+			oos.writeInt(this.getSlots());
+
+			for(ItemStack is : this.items)
+			{
+				oos.writeObject(is);
+			}
+
+			oos.close();
+			return Base64.encodeBytes(out.toByteArray());
+		}
+		catch(Exception ex)
+		{
+			throw ex;
+		}
+	}
+
+	public static Inventory decode(String data)
+		throws Exception
+	{
+		try
+		{
+			ByteArrayInputStream in = new ByteArrayInputStream(Base64.decode(data));
+			ObjectInputStream ois = new ObjectInputStream(in);
+
+			Inventory inv = new Inventory(ois.readInt());
+
+			for(int i = 0; i < inv.getSlots(); i++)
+			{
+				inv.setItemStack(i, (ItemStack) ois.readObject());
+			}
+
+			ois.close();
+			return inv;
+		}
+		catch(Exception ex)
+		{
+			throw ex;
+		}
 	}
 }
