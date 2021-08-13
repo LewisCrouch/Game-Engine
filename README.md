@@ -2,6 +2,7 @@
 
 **Notes**
  * Uses LC_lib.jar (https://github.com/LewisCrouch/Java-Library)
+ * Does not render on the gpu
 
 **Todo**
 * GuiTextField is buggy
